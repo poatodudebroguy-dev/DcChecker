@@ -1,0 +1,55 @@
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Smart Parking - School Lot</title>
+
+  <link rel="stylesheet" href="styles.css" />
+
+  <!-- Leaflet (FREE map, no key needed) -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  />
+</head>
+
+<body>
+
+  <header>
+    <h1>Smart Parking</h1>
+    <p>Real-time school lot availability</p>
+  </header>
+
+  <main>
+
+    <!-- LEFT: STATUS CARD -->
+    <section id="panel">
+      <h2>North Student Lot</h2>
+
+      <div id="status">Loading...</div>
+      <div id="meta"></div>
+
+      <div id="lot-visual">
+        <div id="lot-fill"></div>
+      </div>
+
+      <a id="directions-btn"
+         href="https://www.google.com/maps/search/?api=1&query=34.0522,-118.2437"
+         target="_blank">
+        Get Directions
+      </a>
+    </section>
+
+    <!-- RIGHT: MAP -->
+    <section id="map"></section>
+
+  </main>
+
+  <script src="app.js"></script>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+</body>
+</html>

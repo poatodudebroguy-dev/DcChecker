@@ -1,0 +1,85 @@
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f3f6f9;
+}
+
+/* HEADER */
+header {
+  background: #111827;
+  color: white;
+  padding: 20px 40px;
+}
+
+header h1 {
+  margin: 0;
+}
+
+header p {
+  margin: 5px 0 0;
+  opacity: 0.8;
+}
+
+/* LAYOUT */
+main {
+  display: flex;
+  height: calc(100vh - 80px);
+}
+
+/* PANEL */
+#panel {
+  width: 350px;
+  padding: 25px;
+  background: white;
+  box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+}
+
+#status {
+  font-size: 22px;
+  font-weight: bold;
+  margin-top: 10px;
+}
+
+#meta {
+  margin-top: 10px;
+  color: #555;
+  font-size: 14px;
+}
+
+/* BAR */
+#lot-visual {
+  margin-top: 20px;
+  width: 100%;
+  height: 25px;
+  background: #ddd;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+#lot-fill {
+  height: 100%;
+  width: 0%;
+  background: green;
+  transition: width 0.3s ease;
+}
+
+/* BUTTON */
+#directions-btn {
+  display: block;
+  margin-top: 20px;
+  text-align: center;
+  padding: 12px;
+  background: #2563eb;
+  color: white;
+  text-decoration: none;
+  border-radius: 8px;
+}
+
+#directions-btn:hover {
+  background: #1d4ed8;
+}
+
+/* MAP */
+#map {
+  flex: 1;
+}
