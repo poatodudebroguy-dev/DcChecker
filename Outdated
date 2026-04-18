@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Live Lots</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="page-shell">
+    <section class="landing show" id="landing">
+      <div class="landing__content">
+        <span class="subheading">Welcome to</span>
+        <h1>Live Lots</h1>
+        <p>Find CSUMB parking status in real time while you scroll.</p>
+        <div class="landing-dropdown">
+          <p class="eyebrow">Find your lot</p>
+          <div class="dropdown-wrap">
+            <select id="lotSelect" aria-label="Select parking lot">
+              <option value="97" selected>Lot 97</option>
+              <option value="90" disabled>Lot 90 — coming soon</option>
+              <option value="91" disabled>Lot 91 — coming soon</option>
+              <option value="92" disabled>Lot 92 — coming soon</option>
+              <option value="93" disabled>Lot 93 — coming soon</option>
+              <option value="94" disabled>Lot 94 — coming soon</option>
+              <option value="95" disabled>Lot 95 — coming soon</option>
+              <option value="96" disabled>Lot 96 — coming soon</option>
+              <option value="98" disabled>Lot 98 — coming soon</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="landing-copy-section">
+      <div class="landing-copy">
+        <p>Pick your lot above, then scroll down to view the live CSUMB parking lot map and availability status.</p>
+        <p>This page shows Lot 97 as the active map and updates free/occupied spaces every 30 seconds.</p>
+      </div>
+    </section>
+
+    <main class="content">
+      <section class="map-panel">
+        <div class="map-center">
+          <div class="map-frame" id="mapFrame">
+            <iframe id="mapEmbed" src="https://www.google.com/maps?q=CSUMB+Lot+97+parking&output=embed" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+          </div>
+        </div>
+      </section>
+      <section class="status-row">
+        <div class="status-heading">
+          <h2>Lot 97 status</h2>
+          <p class="status-note">Each parking space is updated every 30 seconds.</p>
+        </div>
+        <ul id="statusList" class="status-list status-list--horizontal"></ul>
+      </section>
+
+      <section class="info-section">
+        <h2>How it works</h2>
+        <p>Scroll to reveal the map content and monitor Lot 97 availability. The dropdown above lets you choose the lot.</p>
+        <p>Only Lot 97 is active now; other CSUMB lots are shown as coming soon and are currently disabled.</p>
+      </section>
+    </main>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
