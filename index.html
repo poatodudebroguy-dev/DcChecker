@@ -32,28 +32,33 @@
       </div>
     </section>
 
+    <section class="landing-copy-section">
+      <div class="landing-copy">
+        <p>Pick your lot above, then scroll down to view the live CSUMB parking lot map and availability status.</p>
+        <p>This page shows Lot 97 as the active map and updates free/occupied spaces every 30 seconds.</p>
+      </div>
+    </section>
+
     <main class="content">
       <section class="map-panel">
-        <div class="map-header">
-          <div class="status-chip"><span class="status-icon status-ok">✓</span> Updated every 30 seconds</div>
-        </div>
-
-        <div class="map-block">
+        <div class="map-center">
           <div class="map-frame" id="mapFrame">
             <iframe id="mapEmbed" src="https://www.google.com/maps?q=CSUMB+Lot+97+parking&output=embed" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
           </div>
-          <aside class="status-panel">
-            <h2>Lot 97 status</h2>
-            <p class="status-note">Each parking space is updated every 30 seconds.</p>
-            <ul id="statusList" class="status-list"></ul>
-          </aside>
         </div>
+      </section>
+      <section class="status-row">
+        <div class="status-heading">
+          <h2>Lot 97 status</h2>
+          <p class="status-note">Each parking space is updated every 30 seconds.</p>
+        </div>
+        <ul id="statusList" class="status-list status-list--horizontal"></ul>
       </section>
 
       <section class="info-section">
         <h2>How it works</h2>
-        <p>Scroll to reveal the map content. Only <strong>Lot 97</strong> is available now. Other CSUMB lots are shown as coming soon.</p>
-        <p>This page uses a live imagery embed for CSUMB and a status panel that refreshes every 30 seconds.</p>
+        <p>Scroll to reveal the map content and monitor Lot 97 availability. The dropdown above lets you choose the lot.</p>
+        <p>Only Lot 97 is active now; other CSUMB lots are shown as coming soon and are currently disabled.</p>
       </section>
     </main>
   </div>
