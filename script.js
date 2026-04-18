@@ -2,6 +2,7 @@ const landing = document.getElementById('landing');
 const lotSelect = document.getElementById('lotSelect');
 const statusList = document.getElementById('statusList');
 const mapEmbed = document.getElementById('mapEmbed');
+const directionsLink = document.getElementById('directionsLink');
 const contentSection = document.querySelector('.content');
 const howItWorksSection = document.querySelector('.how-it-works-section');
 
@@ -52,7 +53,7 @@ const lotStatusData = {
   '301': { label: 'Lot 301', location: '4th Avenue', mapQuery: 'CSUMB+Lot+301' },
   '490': { label: 'Lot 490', location: '8th Street', mapQuery: 'CSUMB+Lot+490' },
   '508': { label: 'Lot 508', location: 'Divarty Street', mapQuery: 'CSUMB+Lot+508' },
-  '903': { label: 'Lot 903', location: 'Divarty Street', mapQuery: 'CSUMB+Lot+903' }
+  '903': { label: 'Lot 903', location: 'Divarty Street', mapQuery: 'CSUMB+Lot+903', directions: 'https://www.google.com/maps/search/?api=1&query=CSUMB+Lot+903' }
 };
 
 function updateLandingVisibility() {
@@ -66,10 +67,23 @@ function updateLandingVisibility() {
   }
 }
 
+function updateHeading(lotId) {
+  const lot = lotStatusData[lotId];
+  const heading = document.querySelector('.status-heading h2');
+  if (heading && lot) {
+    heading.textContent = `${lot.label} status`;
+  }
+}
+
 function renderStatusItems(lotId) {
   const lot = lotStatusData[lotId];
   if (!lot) {
     statusList.innerHTML = '<li class="status-item taken"><span class="icon">!</span><div><strong>Lot unavailable</strong><p>That lot is not active yet.</p></div></li>';
+    return;
+  }
+
+  if (!lot.spaces || lot.spaces.length === 0) {
+    statusList.innerHTML = '<li class="status-item taken"><span class="icon">i</span><div><strong>' + lot.label + '</strong><p>Detailed availability is not available for this lot yet. Map directions are active.</p></div></li>';
     return;
   }
 
@@ -90,6 +104,9 @@ function updateMap(lotId) {
   const lot = lotStatusData[lotId];
   const query = lot ? lot.mapQuery : 'CSUMB+parking';
   mapEmbed.src = `https://www.google.com/maps?q=${query}&output=embed`;
+  if (directionsLink && lot) {
+    directionsLink.href = lot.directions || `https://www.google.com/maps/search/?api=1&query=${query}`;
+  }
 }
 
 function randomizeLotStatus() {
@@ -103,6 +120,7 @@ function randomizeLotStatus() {
 
 lotSelect.addEventListener('change', event => {
   const selected = event.target.value;
+  updateHeading(selected);
   updateMap(selected);
   renderStatusItems(selected);
 });
@@ -129,6 +147,7 @@ const sectionFadeObserver = new IntersectionObserver(
 window.addEventListener('scroll', updateLandingVisibility);
 window.addEventListener('DOMContentLoaded', () => {
   updateLandingVisibility();
+  updateHeading('97');
   renderStatusItems('97');
   updateMap('97');
   setInterval(randomizeLotStatus, 30000);

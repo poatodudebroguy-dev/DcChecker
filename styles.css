@@ -46,6 +46,9 @@ select option[disabled] { color: #9ca3af; }
 
 .map-frame { min-height: 520px; background: #dbeedd; border-radius: 24px; overflow: hidden; box-shadow: var(--shadow); }
 iframe { width: 100%; min-height: 520px; }
+.map-actions { margin-top: 1rem; display: flex; justify-content: center; }
+.map-actions a { display: inline-flex; padding: 0.85rem 1.2rem; border-radius: 999px; background: #0f766e; color: #fff; text-decoration: none; font-weight: 600; }
+.map-actions a:hover { background: #115e59; }
 .status-row { margin: 1.5rem auto 0; width: min(100%, 980px); }
 .status-heading { text-align: center; margin-bottom: 1rem; }
 .status-heading h2 { margin: 0; font-size: 1.1rem; }
