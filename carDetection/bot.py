@@ -1,6 +1,8 @@
 import cv2
 import numpy as np
 import time
+import json
+import os
 
 # YOLO removed: Standard YOLOv8 struggles with top-down satellite imagery (detects cars as 'toilets').
 # We use a custom computer vision variance algorithm instead.
@@ -68,6 +70,16 @@ def run_parking_bot(source="parking_lot.png", parking_map=PARKING_MAP, headless=
     :param parking_map: Dictionary of spot names and their polygon coordinates.
     :param headless: Run without popping up an OpenCV window.
     """
+    # Refer to the variable at the top of this file
+    global LATEST_STATUS
+
+    # Resolve source path: if not found, check the script's directory
+    if isinstance(source, str) and not os.path.isabs(source) and not os.path.exists(source):
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        potential_path = os.path.join(script_dir, source)
+        if os.path.exists(potential_path):
+            source = potential_path
+    print(f"Bot Source Path: {os.path.abspath(source)}")
 
     # Determine source type
     is_image = isinstance(source, str) and source.lower().endswith(('.png', '.jpg', '.jpeg'))
@@ -97,7 +109,6 @@ def run_parking_bot(source="parking_lot.png", parking_map=PARKING_MAP, headless=
         if not ret: break
 
         # Track occupancy using CV variance
-        global LATEST_STATUS
         occupancy_results = {name: "Free" for name in parking_map.keys()}
         
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
@@ -119,38 +130,47 @@ def run_parking_bot(source="parking_lot.png", parking_map=PARKING_MAP, headless=
             total_pixels = np.count_nonzero(mask)
             edge_density = num_edge_pixels / total_pixels if total_pixels > 0 else 0
             
-            # If a spot has high variance or high edge density, there is a car
-            if avg_std > 11.0 or edge_density > 0.009:
+            # Optimized thresholds for satellite imagery detection
+            if avg_std > 8.0 or edge_density > 0.008:
                 occupancy_results[spot_name] = "Occupied"
+            
+            # Debug: Uncomment the line below to see the raw values for tuning
+            # print(f"{spot_name} -> Variance: {avg_std:.2f}, Edges: {edge_density:.4f}")
 
         # Draw the parking spot polygons
         for spot_name, polygon in parking_map.items():
-            color = (0, 0, 255) if occupancy_results[spot_name] == "Occupied" else (0, 255, 0)
+            is_occupied = occupancy_results[spot_name] == "Occupied"
+            color = (0, 0, 255) if is_occupied else (0, 255, 0)
             pts = np.array(polygon, np.int32).reshape((-1, 1, 2))
             cv2.polylines(annotated_frame, [pts], True, color, 2)
             
             cv2.putText(annotated_frame, spot_name, (polygon[0][0], polygon[0][1] - 10),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 1)
 
-        print(f"Status Update: {occupancy_results}")
-        LATEST_STATUS.update(occupancy_results)
+        # Print summary and update global status for the Flask API
+        occupied_count = list(occupancy_results.values()).count("Occupied")
+        print(f"\nBot Heartbeat: {len(occupancy_results)} spots scanned. {occupied_count} occupied.")
         
+        # Clear and update the global dictionary so app.py always has the latest
+        LATEST_STATUS.clear()
+        LATEST_STATUS.update(occupancy_results)
+
         if not headless:
             cv2.imshow("Parking Lot Bot", annotated_frame)
 
             if is_image:
-                print("Analysis complete. Press any key to close window.")
-                cv2.waitKey(0)
-                break
-
-            if cv2.waitKey(1) & 0xFF == ord('q'):
-                break
-        else:
-            if is_image:
-                # If headless and static image, no need to loop prediction, just sleep
-                time.sleep(1)
+                # For images, wait 5 seconds then loop (allows picking up file changes)
+                if cv2.waitKey(5000) & 0xFF == ord('q'):
+                    break
             else:
-                time.sleep(0.03)
+                if cv2.waitKey(1) & 0xFF == ord('q'):
+                    break
+        else:
+            # Small delay to prevent high CPU usage
+            if is_image:
+                time.sleep(5)
+            else:
+                time.sleep(1)
 
     if cap: cap.release()
     cv2.destroyAllWindows()
