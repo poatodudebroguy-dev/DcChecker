@@ -1,0 +1,90 @@
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Live Lots</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+  <div class="page-shell">
+    <section class="landing show" id="landing">
+      <div class="landing__content">
+        <span class="subheading">Welcome to</span>
+        <h1>Live Lots</h1>
+        <p>Find CSUMB parking status in real time while you scroll.</p>
+        <div class="landing-dropdown">
+          <p class="eyebrow">Find your lot</p>
+          <div class="dropdown-wrap">
+            <select id="lotSelect" aria-label="Select parking lot">
+              <option value="97" selected>Lot 97 - 4th Avenue (near Visitors Center)</option>
+              <option value="1">Lot 1 - Divarty Street</option>
+              <option value="13">Lot 13 - 6th Avenue</option>
+              <option value="16">Lot 16 - Inter-Garrison Road</option>
+              <option value="18">Lot 18 - 4th Avenue</option>
+              <option value="19">Lot 19 - 6th Avenue</option>
+              <option value="23">Lot 23 - Engineer Lane</option>
+              <option value="28">Lot 28 - 6th Avenue</option>
+              <option value="29">Lot 29 - 6th Avenue</option>
+              <option value="30">Lot 30 - 6th Avenue</option>
+              <option value="35">Lot 35 - Butler Street</option>
+              <option value="37">Lot 37 - Butler Street</option>
+              <option value="42">Lot 42 - B Street</option>
+              <option value="59">Lot 59 - 7th Avenue and A Street</option>
+              <option value="71">Lot 71 - Inter-Garrison Road</option>
+              <option value="72">Lot 72 - Inter-Garrison Road</option>
+              <option value="80">Lot 80 - General Jim Moore</option>
+              <option value="82">Lot 82 - Inter-Garrison Road</option>
+              <option value="82E">Lot 82E - Inter-Garrison Road</option>
+              <option value="84">Lot 84 - 3rd Avenue</option>
+              <option value="86">Lot 86 - Inter-Garrison Road</option>
+              <option value="90">Lot 90 - Inter-Garrison Road</option>
+              <option value="91">Lot 91 - 3rd Avenue</option>
+              <option value="98">Lot 98 - Divarty Street</option>
+              <option value="100">Lot 100 - 2nd Avenue</option>
+              <option value="106">Lot 106 - 2nd Avenue</option>
+              <option value="107">Lot 107 - 2nd Avenue</option>
+              <option value="208">Lot 208 - Divarty Street</option>
+              <option value="300">Lot 300 - General Jim Moore and 4th Avenue</option>
+              <option value="301">Lot 301 - 4th Avenue</option>
+              <option value="490">Lot 490 - 8th Street</option>
+              <option value="508">Lot 508 - Divarty Street</option>
+              <option value="903">Lot 903 - Divarty Street</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="how-it-works-section">
+      <h2>How it works</h2>
+      <p>Pick your lot above, then scroll down to view the live CSUMB parking lot map and availability status.</p>
+      <p>This page updates the map and directions link for every selected lot, while maintaining the Lot 97 layout style.</p>
+      <p>Scroll to reveal the map content and monitor availability. The dropdown above now activates all campus lots.</p>
+      <p>Lot 97 is fully detailed; all other lots are available to select and show map directions.</p>
+    </section>
+
+    <main class="content">
+      <div class="status-heading">
+        <h2>Lot 97 status</h2>
+        <p class="status-note">Each parking space is updated every 30 seconds.</p>
+      </div>
+      <section class="status-row">
+        <ul id="statusList" class="status-list status-list--horizontal"></ul>
+      </section>
+      <section class="map-panel">
+        <div class="map-center">
+          <div class="map-frame" id="mapFrame">
+            <iframe id="mapEmbed" src="https://www.google.com/maps?q=CSUMB+Lot+97+parking&output=embed" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+          </div>
+          <div class="map-actions">
+            <a id="directionsLink" href="https://www.google.com/maps/@36.654437,-121.7993549,17z" target="_blank">Get directions</a>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

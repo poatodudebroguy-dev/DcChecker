@@ -1,35 +1,73 @@
 import cv2
 import numpy as np
-from ultralytics import YOLO
+import time
 
-def is_inside(box, polygon):
-    """
-    Checks if the center of the detected box is inside the defined polygon (parking spot).
-    """
-    x1, y1, x2, y2 = box
-    center_point = ((x1 + x2) / 2, (y1 + y2) / 2)
-    return cv2.pointPolygonTest(np.array(polygon, np.int32), center_point, False) >= 0
+# YOLO removed: Standard YOLOv8 struggles with top-down satellite imagery (detects cars as 'toilets').
+# We use a custom computer vision variance algorithm instead.
+
+LATEST_STATUS = {}
 
 # Example Map: Define your coordinates here [(x1, y1), (x2, y2), (x3, y3), (x4, y4)]
 PARKING_MAP = {
-    "Space A1": [(50, 100), (200, 100), (200, 300), (50, 300)],
-    "Space A2": [(210, 100), (360, 100), (360, 300), (210, 300)],
-    # Add more spots as needed
+    "Space 1": [(1131, 57), (1294, 57), (1294, 469), (1131, 469)],
+    "Space 2": [(1294, 57), (1457, 57), (1457, 469), (1294, 469)],
+    "Space 3": [(1457, 57), (1619, 57), (1619, 469), (1457, 469)],
+    "Space 4": [(1619, 57), (1782, 57), (1782, 469), (1619, 469)],
+    "Space 5": [(1782, 57), (1945, 57), (1945, 469), (1782, 469)],
+    "Space 6": [(1945, 57), (2108, 57), (2108, 469), (1945, 469)],
+    "Space 7": [(2108, 57), (2271, 57), (2271, 469), (2108, 469)],
+    "Space 8": [(2271, 57), (2434, 57), (2434, 469), (2271, 469)],
+    "Space 9": [(2434, 57), (2597, 57), (2597, 469), (2434, 469)],
+    "Space 10": [(1039, 2013), (1202, 2013), (1202, 2425), (1039, 2425)],
+    "Space 11": [(1202, 2013), (1364, 2013), (1364, 2425), (1202, 2425)],
+    "Space 12": [(1364, 2013), (1527, 2013), (1527, 2425), (1364, 2425)],
+    "Space 13": [(1527, 2013), (1690, 2013), (1690, 2425), (1527, 2425)],
+    "Space 14": [(1690, 2013), (1853, 2013), (1853, 2425), (1690, 2425)],
+    "Space 15": [(1853, 2013), (2016, 2013), (2016, 2425), (1853, 2425)],
+    "Space 16": [(2016, 2013), (2179, 2013), (2179, 2425), (2016, 2425)],
+    "Space 17": [(609, 616), (1008, 616), (1008, 775), (609, 775)],
+    "Space 18": [(609, 775), (1008, 775), (1008, 933), (609, 933)],
+    "Space 19": [(609, 933), (1008, 933), (1008, 1092), (609, 1092)],
+    "Space 20": [(609, 1092), (1008, 1092), (1008, 1251), (609, 1251)],
+    "Space 21": [(609, 1251), (1008, 1251), (1008, 1410), (609, 1410)],
+    "Space 22": [(609, 1410), (1008, 1410), (1008, 1569), (609, 1569)],
+    "Space 23": [(609, 1569), (1008, 1569), (1008, 1728), (609, 1728)],
+    "Space 24": [(609, 1728), (1008, 1728), (1008, 1887), (609, 1887)],
+    "Space 25": [(609, 1887), (1008, 1887), (1008, 2046), (609, 2046)],
+    "Space 26": [(609, 2046), (1008, 2046), (1008, 2205), (609, 2205)],
+    "Space 27": [(609, 2205), (1008, 2205), (1008, 2364), (609, 2364)],
+    "Space 28": [(2790, 616), (3190, 616), (3190, 775), (2790, 775)],
+    "Space 29": [(2790, 775), (3190, 775), (3190, 933), (2790, 933)],
+    "Space 30": [(2790, 933), (3190, 933), (3190, 1092), (2790, 1092)],
+    "Space 31": [(2790, 1092), (3190, 1092), (3190, 1251), (2790, 1251)],
+    "Space 32": [(2790, 1251), (3190, 1251), (3190, 1410), (2790, 1410)],
+    "Space 33": [(2790, 1410), (3190, 1410), (3190, 1569), (2790, 1569)],
+    "Space 34": [(2790, 1569), (3190, 1569), (3190, 1728), (2790, 1728)],
+    "Space 35": [(2790, 1728), (3190, 1728), (3190, 1887), (2790, 1887)],
+    "Space 36": [(2790, 1887), (3190, 1887), (3190, 2046), (2790, 2046)],
+    "Space 37": [(2790, 2046), (3190, 2046), (3190, 2205), (2790, 2205)],
+    "Space 38": [(2790, 2205), (3190, 2205), (3190, 2364), (2790, 2364)],
+    "Space 39": [(1392, 1057), (1561, 1057), (1561, 1498), (1392, 1498)],
+    "Space 40": [(1561, 1057), (1730, 1057), (1730, 1498), (1561, 1498)],
+    "Space 41": [(1730, 1057), (1899, 1057), (1899, 1498), (1730, 1498)],
+    "Space 42": [(1899, 1057), (2068, 1057), (2068, 1498), (1899, 1498)],
+    "Space 43": [(2068, 1057), (2237, 1057), (2237, 1498), (2068, 1498)],
+    "Space 44": [(1392, 1498), (1561, 1498), (1561, 1940), (1392, 1940)],
+    "Space 45": [(1561, 1498), (1730, 1498), (1730, 1940), (1561, 1940)],
+    "Space 46": [(1730, 1498), (1899, 1498), (1899, 1940), (1730, 1940)],
+    "Space 47": [(1899, 1498), (2068, 1498), (2068, 1940), (1899, 1940)],
+    "Space 48": [(2068, 1498), (2237, 1498), (2237, 1940), (2068, 1940)],
 }
 
-def run_parking_bot(source="parking_lot.png", parking_map=PARKING_MAP, confidence=0.45):
+def run_parking_bot(source="parking_lot.png", parking_map=PARKING_MAP, headless=False):
     """
-    A bot that detects cars, motorcycles, and trucks using YOLOv8.
-    It strictly ignores people (Class 0) to focus on vehicle occupancy.
+    A custom computer vision bot that detects cars using pixel variance and edge density.
+    This works significantly better for top-down satellite imagery than standard YOLO models.
     
     :param source: 0 for webcam, a video path, or an image path.
     :param parking_map: Dictionary of spot names and their polygon coordinates.
-    :param confidence: Minimum confidence threshold for detection.
+    :param headless: Run without popping up an OpenCV window.
     """
-    model = YOLO("yolov8n.pt")
-
-    # Filter for: 2 (car), 3 (motorcycle), 7 (truck)
-    TARGET_CLASSES = [2, 3, 7] 
 
     # Determine source type
     is_image = isinstance(source, str) and source.lower().endswith(('.png', '.jpg', '.jpeg'))
@@ -43,7 +81,9 @@ def run_parking_bot(source="parking_lot.png", parking_map=PARKING_MAP, confidenc
         cap = None
 
     print("--- Vehicle Detection Bot Active ---")
-    print("Filtering for: Cars, Motorcycles, and Trucks.")
+    print("Using Custom Top-Down Variance Algorithm.")
+    if not headless:
+        cv2.namedWindow("Parking Lot Bot", cv2.WINDOW_NORMAL)
 
     while True:
         if is_image:
@@ -56,28 +96,32 @@ def run_parking_bot(source="parking_lot.png", parking_map=PARKING_MAP, confidenc
 
         if not ret: break
 
-        # Perform detection
-        results = model.predict(
-            source=frame, 
-            classes=TARGET_CLASSES, 
-            conf=confidence, 
-            verbose=False
-        )
-
-        # Extract detections for the current frame
-        detections = results[0].boxes
-        
-        # Track occupancy
+        # Track occupancy using CV variance
+        global LATEST_STATUS
         occupancy_results = {name: "Free" for name in parking_map.keys()}
         
-        for box_tensor in detections.xyxy:
-            box = box_tensor.cpu().numpy()
-            for spot_name, polygon in parking_map.items():
-                if is_inside(box, polygon):
-                    occupancy_results[spot_name] = "Occupied"
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        edges = cv2.Canny(gray, 50, 150)
 
-        # Visualize results on the frame
-        annotated_frame = results[0].plot()
+        annotated_frame = frame.copy()
+
+        for spot_name, polygon in parking_map.items():
+            mask = np.zeros(gray.shape, dtype=np.uint8)
+            pts = np.array(polygon, np.int32).reshape((-1, 1, 2))
+            cv2.fillPoly(mask, [pts], 255)
+            
+            # Calculate color variance and edge density
+            mean, stddev = cv2.meanStdDev(frame, mask=mask)
+            avg_std = np.mean(stddev)
+            
+            spot_pixels = cv2.bitwise_and(edges, edges, mask=mask)
+            num_edge_pixels = np.count_nonzero(spot_pixels)
+            total_pixels = np.count_nonzero(mask)
+            edge_density = num_edge_pixels / total_pixels if total_pixels > 0 else 0
+            
+            # If a spot has high variance or high edge density, there is a car
+            if avg_std > 11.0 or edge_density > 0.009:
+                occupancy_results[spot_name] = "Occupied"
 
         # Draw the parking spot polygons
         for spot_name, polygon in parking_map.items():
@@ -89,15 +133,24 @@ def run_parking_bot(source="parking_lot.png", parking_map=PARKING_MAP, confidenc
                         cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 1)
 
         print(f"Status Update: {occupancy_results}")
-        cv2.imshow("Parking Lot Bot", annotated_frame)
+        LATEST_STATUS.update(occupancy_results)
+        
+        if not headless:
+            cv2.imshow("Parking Lot Bot", annotated_frame)
 
-        if is_image:
-            print("Analysis complete. Press any key to close window.")
-            cv2.waitKey(0)
-            break
+            if is_image:
+                print("Analysis complete. Press any key to close window.")
+                cv2.waitKey(0)
+                break
 
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                break
+        else:
+            if is_image:
+                # If headless and static image, no need to loop prediction, just sleep
+                time.sleep(1)
+            else:
+                time.sleep(0.03)
 
     if cap: cap.release()
     cv2.destroyAllWindows()
